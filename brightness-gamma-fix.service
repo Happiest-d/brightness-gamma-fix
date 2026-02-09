@@ -1,0 +1,12 @@
+[Unit]
+Description=Auto-adjust green gamma based on brightness
+
+[Service]
+Type=simple
+# Путь к скрипту — замените YOUR_USER на своё имя пользователя
+ExecStart=/bin/bash -c 'inotifywait -m -e modify /sys/class/backlight/amdgpu_bl1/brightness | while read; do %h/.local/bin/brightness-gamma-fix.sh; done'
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target

@@ -52,9 +52,17 @@ echo "  Подсветка:  $BACKLIGHT_PATH"
 echo "  Макс:       $MAX_BRIGHTNESS"
 echo ""
 
-# Настройка силы коррекции
-read -p "Сила коррекции зелёного (0.75 по умолчанию, меньше = сильнее): " MIN_GAMMA
-MIN_GAMMA="${MIN_GAMMA:-0.75}"
+# Настройка силы коррекции по каналам
+echo "Настройка коррекции по каналам (R:G:B)."
+echo "Значение 1.0 = без коррекции, меньше = сильнее."
+echo "По умолчанию: R=0.90, G=0.80, B=0.80"
+echo ""
+read -p "Коррекция красного  (0.90): " MIN_GAMMA_R
+read -p "Коррекция зелёного  (0.80): " MIN_GAMMA_G
+read -p "Коррекция синего    (0.80): " MIN_GAMMA_B
+MIN_GAMMA_R="${MIN_GAMMA_R:-0.90}"
+MIN_GAMMA_G="${MIN_GAMMA_G:-0.80}"
+MIN_GAMMA_B="${MIN_GAMMA_B:-0.80}"
 
 # Копирование скрипта
 mkdir -p "$HOME/.local/bin"
@@ -68,7 +76,9 @@ sed -i "s|DISPLAY_NAME=\"\${DISPLAY_NAME:-eDP}\"|DISPLAY_NAME=\"\${DISPLAY_NAME:
 sed -i "s|BACKLIGHT=\"\${BACKLIGHT:-/sys/class/backlight/amdgpu_bl1/brightness}\"|BACKLIGHT=\"\${BACKLIGHT:-$BACKLIGHT_PATH}\"|" "$SCRIPT_PATH"
 sed -i "s|MAX=\"\${MAX:-255}\"|MAX=\"\${MAX:-$MAX_BRIGHTNESS}\"|" "$SCRIPT_PATH"
 sed -i "s|MID=\"\${MID:-191}\"|MID=\"\${MID:-$MID_BRIGHTNESS}\"|" "$SCRIPT_PATH"
-sed -i "s|MIN_GAMMA=\"\${MIN_GAMMA:-0.75}\"|MIN_GAMMA=\"\${MIN_GAMMA:-$MIN_GAMMA}\"|" "$SCRIPT_PATH"
+sed -i "s|MIN_GAMMA_R=\"\${MIN_GAMMA_R:-0.90}\"|MIN_GAMMA_R=\"\${MIN_GAMMA_R:-$MIN_GAMMA_R}\"|" "$SCRIPT_PATH"
+sed -i "s|MIN_GAMMA_G=\"\${MIN_GAMMA_G:-0.80}\"|MIN_GAMMA_G=\"\${MIN_GAMMA_G:-$MIN_GAMMA_G}\"|" "$SCRIPT_PATH"
+sed -i "s|MIN_GAMMA_B=\"\${MIN_GAMMA_B:-0.80}\"|MIN_GAMMA_B=\"\${MIN_GAMMA_B:-$MIN_GAMMA_B}\"|" "$SCRIPT_PATH"
 
 echo "Скрипт установлен: $SCRIPT_PATH"
 
@@ -78,7 +88,7 @@ SERVICE_PATH="$HOME/.config/systemd/user/brightness-gamma-fix.service"
 
 cat > "$SERVICE_PATH" << EOF
 [Unit]
-Description=Auto-adjust green gamma based on brightness
+Description=Auto-adjust gamma based on brightness
 
 [Service]
 Type=simple
@@ -100,8 +110,8 @@ echo "Сервис запущен и добавлен в автозагрузк�
 echo "Попробуйте изменить яркость — коррекция должна применяться автоматически."
 echo ""
 echo "Подобрать значения вручную:"
-echo "  xrandr --output $DISPLAY_NAME --gamma 1.0:0.75:1.0  # применить"
-echo "  xrandr --output $DISPLAY_NAME --gamma 1.0:1.0:1.0   # сбросить"
+echo "  xrandr --output $DISPLAY_NAME --gamma 0.90:0.80:0.80  # применить"
+echo "  xrandr --output $DISPLAY_NAME --gamma 1.0:1.0:1.0     # сбросить"
 echo ""
 echo "Управление:"
 echo "  systemctl --user status brightness-gamma-fix.service"

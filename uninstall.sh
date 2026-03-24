@@ -12,10 +12,7 @@ systemctl --user daemon-reload
 # Удаление скрипта
 rm -f "$HOME/.local/bin/brightness-gamma-fix.sh"
 
-# Сброс гаммы
-DISPLAY_NAME=$(xrandr --listmonitors 2>/dev/null | grep -oP '\S+$' | tail -1)
-if [ -n "$DISPLAY_NAME" ]; then
-    xrandr --output "$DISPLAY_NAME" --gamma 1.0:1.0:1.0 2>/dev/null || true
-fi
+# Сброс коррекции
+DISPLAY="${DISPLAY:-:0}" xcalib -clear 2>/dev/null || true
 
-echo "Готово. Гамма сброшена, сервис удалён."
+echo "Готово. Коррекция сброшена, сервис удалён."
